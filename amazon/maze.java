@@ -1,6 +1,6 @@
 import java.util.*;
 
-public class maze {
+public class Maze {
 
 	private static boolean canVisit(int x, int y, boolean[][] visited, int[][] maze) {
 		int m = visited.length;
