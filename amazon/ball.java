@@ -1,39 +1,51 @@
 
-
 import java.util.*;
 
-public class ball {
-	
-	public static int getSum(String[] s) {
-		int sum = 0;
-		Stack<Integer> stk = new Stack<>();
-		for (int i=0; i<s.length; ++i) {
-			if (s[i] == "Z") {
-				sum -= stk.empty() ? 0 : stk.pop();	
-			} else if (s[i] == "X") {
-				if (!stk.empty()) {
-					stk.push(stk.peek() * 2);
-				}
-				sum += stk.empty() ? 0 : stk.peek();
-			} else if (s[i] == "+") {
-				if (stk.size() >= 2) {
-					stk.push(stk.get(stk.size()-1) + stk.get(stk.size()-2));
-				} else if (stk.size() >= 1) {
-					stk.push(stk.get(stk.size()-1));
-				} 
-				sum += stk.empty() ? 0 : stk.peek();
-			} else {
-				stk.push( Integer.parseInt(s[i]) );
-				sum += stk.empty() ? 0 : stk.peek();
-			}
-			System.out.println(stk);
-			System.out.println(sum);			
-		}
-		return sum;
-	}
+class Ball {
+    public static int ballCount(String[] score) {
+        if (score == null || score.length == 0) {
+            return 0;
+        }
 
-	public static void main(String[] args) {
+        Stack<Integer> stack = new Stack<Integer>();
+
+        int sum = 0;
+        for (int i = 0; i < score.length; i++) {
+            String block = score[i];
+            System.out.println(block);
+            int val = 0;
+            if (block.equals("Z")) {
+                val = stack.isEmpty() ? 0 : stack.pop();
+                sum -= val;
+            } else if (block.equals("X")) {
+                val = stack.isEmpty() ? 0 : stack.pop() * 2;
+                sum += val;
+                stack.push(val);
+            } else if (block.equals("+")) {
+                int size = stack.size();
+                if (size >= 2) {
+                    val = stack.get(size - 1) + stack.get(size - 2);
+                } else if (size == 1) {
+                    val = stack.get(size - 1);
+                }
+                sum += val;
+                stack.push(val);
+            } else {
+                val = Integer.parseInt(block);
+                sum += val;
+                stack.push(val);
+            }
+            System.out.println("sum: " + sum + stack);
+        }
+
+        System.out.println(sum);
+        return sum;
+    }
+
+    public static void main(String[] args) {
+        System.out.println("hahahhahah");
+
         String[] s = new String[] {"5", "-2", "4", "Z", "X", "9", "+", "+"};
-        System.out.println(getSum(s));
-	}
+        System.out.println(ballCount(s));
+    }
 }

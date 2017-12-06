@@ -1,101 +1,88 @@
-import java.util.*;
-
-public class bstDistance {
-	
-	public static class TreeNode {
-		int val;
-		TreeNode left;
-		TreeNode right;
-		TreeNode(int val) {
-			this.val = val;
-		}
-	}
-
-	public static TreeNode insert(TreeNode root, int x) {
-		if (root == null) {
-			return new TreeNode(x);
-		}
-		if (x < root.val) {
-			root.left = insert(root.left, x);
-		} else {
-			root.right = insert(root.right, x);
-		}
-		return root;
-	}
-
-	public static void getPath(TreeNode root, int k, List<Integer> path) {
-		if (root == null) {
-			return;
-		}
-
-		path.add(root.val);
-		if (root.val == k) {
-			return;
-		} else if (k < root.val) {
-			getPath(root.left, k, path);
-		} else {
-			getPath(root.right, k, path);
-		}
-	}
-
-	public static int getDistance(TreeNode root, int n1, int n2) {
-		List<Integer> path1 = new ArrayList<Integer>();
-		List<Integer> path2 = new ArrayList<Integer>();
-
-		getPath(root, n1, path1);
-		getPath(root, n2, path2);	
-
-		int i = 0;
-		while (i<path1.size() && i<path2.size()) {
-			if (path1.get(i) != path2.get(i)) {
-				break;
-			}
-			++i;
-		}
-		// nodes not in the tree
-		if (path1.size()==0 || path2.size()==0 || path1.get(path1.size()-1)!=n1 || path2.get(path2.size()-1)!=n2) {
-			return -1;
-		}
-
-		// nodes in diff branch
-		if (i<path1.size() && i<path2.size() && path1.get(i) != path2.get(i)) {
-			return path1.size()-i + path2.size()-i;
-		} 
-		
-		// nodes in same branch
-		return Math.max(path1.size(), path2.size()) - i;
-	}
-
-	public static void preOrder(TreeNode root) {
-		if (root == null) {
-			return;
-		}
-		System.out.println(root.val);
-		preOrder(root.left);
-		preOrder(root.right);
-	}
-
-	public static void inOrder(TreeNode root) {
-		if (root == null) {
-			return;
-		}
- 		inOrder(root.left);
-		System.out.println(root.val);
-		inOrder(root.right);
-	}	
-
-	public static void main(String[] args) {
-		System.out.println("hahahha");
-		int[] A = new int[] {5, 6, 3, 1, 2, 4};
-		TreeNode root = null;
-
-		for (int i=0; i<A.length; ++i) {
-			root = insert(root, A[i]);
-		}
+public class BSTDistance {
+    class TreeNode {
+        int val;
+        TreeNode left;
+        TreeNode right;
+        public TreeNode(int val) {
+            this.val = val;
+        }
+    }
+    private static TreeNode root;
+    public void constructBST(int[] nums) {
+        for (int i = 0; i < nums.length; i++) {
+            if (root != null) {
+                constructHelper(root, nums[i]);
+            } else {
+                root = new TreeNode(nums[i]);
+            }
+        }
+    }
+    public void constructHelper(TreeNode node, int item) {
+        if(node.val > item) {
+            // construct from left
+            if(node.left == null) {
+                node.left = new TreeNode(item);
+            } else {
+                constructHelper(node.left, item);
+            }
+        } else {
+            //construct from right
+            if(node.right == null) {
+                node.right = new TreeNode(item);
+            } else {
+                constructHelper(node.right, item);
+            }
+        }
+    }
 
 
-		System.out.println(getDistance(root, 2, 4));
-		System.out.println(getDistance(root, 2, 2));
-		System.out.println(getDistance(root, 2, 7));
-	}
+    public static int getDistanceFromRoot(TreeNode node) {
+        int distance = 0;
+        TreeNode curr = root;
+        while(curr != null) {
+            if(curr.val > node.val) {
+                curr = curr.left;
+            } else if(curr.val < node.val) {
+                curr = curr.right;
+            } else {
+                return distance;
+            }
+            distance++;
+        }
+        return -1;
+    }
+
+    public static TreeNode BST_LCA(TreeNode root, TreeNode a, TreeNode b) {
+        if (root == null)
+            return root;
+        if (root == a || root == b)
+            return root;
+        if (Math.max(a.val, b.val) < root.val) // a.val < root.val && b.val < root.val, on the left subtree
+            return BST_LCA(root.left, a, b);
+        else if (Math.min(a.val, b.val) > root.val) // a.val > root.val && b.val > root.val, on the right subtree
+            return BST_LCA(root.right, a, b);
+        else
+            return root;
+    }
+
+    public int getDistance(int[] nums, int n, int n1, int n2) {
+        TreeNode node1 = new TreeNode(n1);
+        TreeNode node2 = new TreeNode(n2);
+        TreeNode lca = BST_LCA(root, node1, node2);
+        int s1 = getDistanceFromRoot(node1);
+        int s2 = getDistanceFromRoot(node2);
+        int slca = getDistanceFromRoot(lca);
+        if(s1 >= 0 && s2 >= 0) {
+            return  s1 + s2 - 2 * slca;
+        }
+        return -1;
+    }
+
+    public static void main(String[] args) {
+        BSTDistance bstDistance = new BSTDistance();
+        int[] values = {1};
+        bstDistance.constructBST(values);
+        int res = bstDistance.getDistance(values, 1,1,1);
+        System.out.println(res);
+    }
 }
