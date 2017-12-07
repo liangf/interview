@@ -7,82 +7,87 @@ public class BSTDistance {
             this.val = val;
         }
     }
-    private static TreeNode root;
-    public void constructBST(int[] nums) {
+
+    public void inorder(TreeNode root) {
+        if (root == null) return;
+
+        inorder(root.left);
+        System.out.println(root.val);
+        inorder(root.right);
+    }
+
+    public TreeNode constructBST(int[] nums) {
+        TreeNode root = null;
         for (int i = 0; i < nums.length; i++) {
-            if (root != null) {
-                constructHelper(root, nums[i]);
-            } else {
-                root = new TreeNode(nums[i]);
-            }
+            root = insert(root, nums[i]);
         }
+        return root;
     }
-    public void constructHelper(TreeNode node, int item) {
-        if(node.val > item) {
-            // construct from left
-            if(node.left == null) {
-                node.left = new TreeNode(item);
-            } else {
-                constructHelper(node.left, item);
-            }
+
+    public TreeNode insert(TreeNode root, int key) {
+        if (root == null) {
+            return new TreeNode(key);
+        }
+
+        if (key < root.val) {
+            root.left = insert(root.left, key);
         } else {
-            //construct from right
-            if(node.right == null) {
-                node.right = new TreeNode(item);
-            } else {
-                constructHelper(node.right, item);
-            }
+            root.right = insert(root.right, key);
         }
+        return root;
     }
 
-
-    public static int getDistanceFromRoot(TreeNode node) {
-        int distance = 0;
-        TreeNode curr = root;
-        while(curr != null) {
-            if(curr.val > node.val) {
-                curr = curr.left;
-            } else if(curr.val < node.val) {
-                curr = curr.right;
+    public int getDistanceFrom(TreeNode root, int key) {
+        int d = 0;
+        while (root != null) {
+            if (key < root.val) {
+                root = root.left;
+            } else if (key > root.val) {
+                root = root.right;
             } else {
-                return distance;
+                return d;
             }
-            distance++;
+            d++;
         }
         return -1;
     }
 
-    public static TreeNode BST_LCA(TreeNode root, TreeNode a, TreeNode b) {
-        if (root == null)
-            return root;
-        if (root == a || root == b)
-            return root;
-        if (Math.max(a.val, b.val) < root.val) // a.val < root.val && b.val < root.val, on the left subtree
+    public TreeNode BST_LCA(TreeNode root, int a, int b) {
+        if (root == null) return null;
+
+        if (Math.max(a, b) < root.val) // a.val < root.val && b.val < root.val, on the left subtree
             return BST_LCA(root.left, a, b);
-        else if (Math.min(a.val, b.val) > root.val) // a.val > root.val && b.val > root.val, on the right subtree
+        else if (Math.min(a, b) > root.val) // a.val > root.val && b.val > root.val, on the right subtree
             return BST_LCA(root.right, a, b);
         else
             return root;
     }
 
-    public int getDistance(int[] nums, int n, int n1, int n2) {
-        TreeNode node1 = new TreeNode(n1);
-        TreeNode node2 = new TreeNode(n2);
-        TreeNode lca = BST_LCA(root, node1, node2);
-        int s1 = getDistanceFromRoot(node1);
-        int s2 = getDistanceFromRoot(node2);
-        int slca = getDistanceFromRoot(lca);
-        if(s1 >= 0 && s2 >= 0) {
-            return  s1 + s2 - 2 * slca;
+    public int getDistance(int[] nums, int n1, int n2) {
+        TreeNode root = constructBST(nums);
+        TreeNode lca = BST_LCA(root, n1, n2);
+
+        int d1 = getDistanceFrom(lca, n1);
+        int d2 = getDistanceFrom(lca, n2);
+        System.out.println("d1:" + d1);
+        System.out.println("d2:" + d2);
+        if(d1 >= 0 && d2 >= 0) {
+            return  d1 + d2;
         }
         return -1;
     }
 
     public static void main(String[] args) {
         BSTDistance bstDistance = new BSTDistance();
-        int[] values = {1};
-        bstDistance.constructBST(values);
-        int res = bstDistance.getDistance(values, 1,1,1);
-        System.out.println(res);
+
+
+        // int[] values = new int[] {1};
+        // System.out.println(bstDistance.getDistance(values, 1, 1));
+
+
+        int[] values = new int[] {5, 6, 3, 1, 2, 4};
+        // System.out.println(bstDistance.getDistance(values, 2, 6));
+        System.out.println(bstDistance.getDistance(values, 1, 4));
+
     }
 }
